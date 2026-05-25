@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3.6u1_08分類題 — 互動練習</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "標楷體", "新細明體", "Noto Sans TC", sans-serif;
+    background: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container { max-width: 760px; margin: 0 auto; }
+
+  h1 {
+    text-align: center;
+    color: #4a148c;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #7b1fa2;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .progress-bar {
+    background: #e0e0e0;
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7b1fa2, #4a148c);
+    border-radius: 20px;
+    transition: width 0.4s;
+    width: 0%;
+  }
+  .progress-text {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+
+  .q-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-left: 5px solid #7b1fa2;
+  }
+
+  .q-num {
+    display: inline-block;
+    background: #7b1fa2;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    text-align: center; line-height: 28px;
+    margin-bottom: 8px;
+  }
+
+  .instruction {
+    font-size: 1.05rem;
+    color: #1a1a2e;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .pool-area {
+    background: #f5f0ff;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+    min-height: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pool-label {
+    font-size: 0.8rem;
+    color: #7b1fa2;
+    font-weight: bold;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .item-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: #ede7f6;
+    border: 2px solid #b39ddb;
+    color: #4a148c;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+
+  .item-chip:hover { background: #d1c4e9; }
+
+  .item-chip.placed-cat1 {
+    background: #e8f5e9;
+    border-color: #81c784;
+    color: #1b5e20;
+  }
+  .item-chip.placed-cat2 {
+    background: #fff3e0;
+    border-color: #ffb74d;
+    color: #e65100;
+  }
+  .item-chip.placed-none {
+    background: #ede7f6;
+    border-color: #b39ddb;
+    color: #4a148c;
+  }
+
+  .cat-zones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .cat-zone {
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 80px;
+    border: 2px dashed #ccc;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cat-zone.drop-active {
+    border-color: #7b1fa2;
+    background: #f3e5f5;
+  }
+
+  .cat-zone.correct-zone {
+    border-color: #2e7d32;
+    border-style: solid;
+    background: #e8f5e9;
+  }
+  .cat-zone.wrong-zone {
+    border-color: #c62828;
+    border-style: solid;
+    background: #ffebee;
+  }
+
+  .cat-header {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 4px;
+  }
+
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+  }
+
+  .cat-chip.cat1-chip {
+    background: #c8e6c9;
+    color: #1b5e20;
+    border-color: #81c784;
+  }
+  .cat-chip.cat2-chip {
+    background: #ffe0b2;
+    color: #e65100;
+    border-color: #ffb74d;
+  }
+  .cat-chip:hover { opacity: 0.75; }
+
+  .cat-empty {
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 4px 8px;
+    font-style: italic;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .btn-check {
+    background: #7b1fa2;
+    color: white;
+  }
+  .btn-check:hover { background: #4a148c; }
+  .btn-check:disabled { background: #ccc; cursor: default; }
+
+  .btn-reset {
+    background: white;
+    color: #7b1fa2;
+    border: 2px solid #7b1fa2;
+  }
+  .btn-reset:hover { background: #f3e5f5; }
+
+  .feedback {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    display: none;
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .feedback.wrong-fb { background: #fff3f3; color: #b71c1c; border: 1px solid #ffcdd2; }
+
+  .result-section {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-top: 24px;
+    display: none;
+  }
+  .result-section.show { display: block; animation: fadeIn 0.5s; }
+  .score { font-size: 3.5rem; font-weight: bold; color: #4a148c; }
+  .stars { font-size: 2.5rem; margin: 8px 0; }
+  .correct-count { color: #2e7d32; }
+  .wrong-count { color: #c62828; }
+  .retry-btn {
+    margin-top: 16px;
+    padding: 12px 36px;
+    background: #7b1fa2;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .retry-btn:hover { background: #4a148c; }
+
+  .item-chip.correct-item { background: #c8e6c9 !important; border-color: #388e3c !important; color: #1b5e20 !important; }
+  .item-chip.wrong-item { background: #ffcdd2 !important; border-color: #d32f2f !important; color: #b71c1c !important; }
+  .item-chip.missed-item { background: #fff9c4 !important; border-color: #f9a825 !important; color: #e65100 !important; }
+
+  @media (max-width: 600px) {
+    .cat-zones { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔀 分類題 — 單元一 香港是我家</h1>
+  <p class="subtitle">主題 6：香港知多少 &nbsp;|&nbsp; 3.6u1_08分類題</p>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <p class="progress-text" id="progressText">已答：0 / 11</p>
+
+  <div id="questions"></div>
+
+  <div class="result-section" id="resultSection">
+    <h2 id="resultTitle"></h2>
+    <div class="stars" id="stars"></div>
+    <div class="score"><span id="scoreNum">0</span><span> / 11</span></div>
+    <p id="resultMsg"></p>
+    <button class="retry-btn" onclick="resetQuiz()">🔄 重新作答</button>
+  </div>
+</div>
+
+<script>
+const questions = [{'instruction': '以下哪些事物是有關中國內地的？哪些是有關香港的？把它們分類。', 'cat1': '有關中國內地的事物', 'cat2': '有關香港的事物', 'items': ['A', 'B', 'C', 'D', 'E', 'F'], 'itemText': {'A': '簡體中文字', 'B': '繁體中文字', 'C': '中華人民共和國護照', 'D': '香港特別行政區護照', 'E': '港幣', 'F': '人民幣'}, 'answers': {'1': ['A', 'C', 'F'], '2': ['B', 'D', 'E']}, 'explanation': '中國內地用簡體字及人民幣，旅遊用中國護照；香港用繁體字、港幣及特區護照。'}, {'instruction': '以下哪些是中華人民共和國國旗獨有的特徵？哪些是香港特別行政區區旗獨有的特徵？把它們分類。', 'cat1': '國旗獨有的特徵', 'cat2': '區旗獨有的特徵', 'items': ['A', 'B', 'C', 'D', 'E'], 'itemText': {'A': '黃色的星形圖案', 'B': '花卉圖案', 'C': '五顆星大小相同', 'D': '一顆大星和四顆小星', 'E': '白色圖案'}, 'answers': {'1': ['A', 'D'], '2': ['B', 'C', 'E']}, 'explanation': '國旗有一大四小星；區旗有紫荊花、五星大小相同、白色的設計。'}, {'instruction': '以下哪些是香港回歸紀念日的慶祝活動？哪些不是？把它們分類。', 'cat1': '香港回歸紀念日的慶祝活動', 'cat2': '不是香港回歸紀念日的慶祝活動', 'items': ['A', 'B', 'C', 'D'], 'itemText': {'A': '花車巡遊', 'B': '林村許願節', 'C': '慶回歸文藝晚會', 'D': '升旗禮'}, 'answers': {'1': ['C', 'D'], '2': ['A', 'B']}, 'explanation': '慶回歸文藝晚會及升旗禮是回歸紀念日活動；林村許願節和花車巡遊並非回歸紀念日活動。'}, {'instruction': '以下哪些是香港居民享有的自由和權利？哪些是我們要遵守的規則？把它們分類。', 'cat1': '享有的自由和權利', 'cat2': '要遵守的規則', 'items': ['A', 'B', 'C', 'D'], 'itemText': {'A': '參與宗教活動', 'B': '在公眾地方保持秩序', 'C': '在社交媒體發表個人意見', 'D': '不隨地拋垃圾'}, 'answers': {'1': ['A', 'C'], '2': ['B', 'D']}, 'explanation': '享有宗教自由及言論自由；保持秩序及不拋垃圾是我們需遵守的規則。'}, {'instruction': '以下哪些是我們享有的自由和權利？哪些是尊重別人的權利？把它們分類。', 'cat1': '享有的自由和權利', 'cat2': '尊重別人的權利', 'items': ['A', 'B', 'C', 'D'], 'itemText': {'A': '到外國探訪親戚', 'B': '尊重他人發表意見', 'C': '參加各種論壇活動', 'D': '遵守交通規則'}, 'answers': {'1': ['A', 'C'], '2': ['B', 'D']}, 'explanation': '出入境自由及言論自由屬享有權利；尊重他人意見及遵守規則屬尊重別人的權利。'}, {'instruction': '以下哪些是宗教信仰自由的例子？哪些是選擇職業自由的例子？把它們分類。', 'cat1': '宗教信仰自由的例子', 'cat2': '選擇職業自由的例子', 'items': ['A', 'B', 'C', 'D'], 'itemText': {'A': '思思信奉天主教，常常到教堂參加宗教活動', 'B': '浩文在政府部門工作了五年，然後到了銀行工作', 'C': '楊先生在餐廳工作了十多年，然後決定自行創業', 'D': '陳小姐信奉伊斯蘭教，不吃豬肉'}, 'answers': {'1': ['A', 'D'], '2': ['B', 'C']}, 'explanation': '信奉宗教、不吃某些食物屬宗教自由；轉工及創業屬選擇職業自由。'}, {'instruction': '以下哪些是遵守踏單車規則的例子？哪些是不遵守踏單車規則的例子？把它們分類。', 'cat1': '遵守踏單車規則的例子', 'cat2': '不遵守踏單車規則的例子', 'items': ['A', 'B', 'C', 'D', 'E', 'F'], 'itemText': {'A': '載客', 'B': '載上頭盔及保護墊', 'C': '橫過行人過路處時下车', 'D': '在行人路上踏單車', 'E': '在指定供停泊單車的地方停泊單車', 'F': '使用單車徑'}, 'answers': {'1': ['B', 'C', 'E', 'F'], '2': ['A', 'D']}, 'explanation': '戴頭盔、在過路處下车、在指定地點停泊及使用單車徑均屬遵守規則；載客及在行人路踏單車屬違規。'}, {'instruction': '以下哪些是在郊野公園內應有的行為？哪些是不應有的行為？把它們分類。', 'cat1': '在郊野公園內應有的行為', 'cat2': '在郊野公園內不應有的行為', 'items': ['A', 'B', 'C', 'D', 'E'], 'itemText': {'A': '餵飼野生動物', 'B': '降低聲量', 'C': '隨地拋棄廢物', 'D': '小心處理火種', 'E': '在溪澗嬉水'}, 'answers': {'1': ['B', 'D'], '2': ['A', 'C', 'E']}, 'explanation': '降低聲量及小心處理火種屬應有行為；餵飼動物、拋垃圾及在溪澗嬉水均屬不應有的行為。'}, {'instruction': '以下哪些是在戲院裏要遵守的規則？哪些是在巴士上要遵守的規則？把它們分類。', 'cat1': '在戲院裏要遵守的規則', 'cat2': '在巴士上要遵守的規則', 'items': ['A', 'B', 'C', 'D', 'E'], 'itemText': {'A': '不可在上層站立', 'B': '不可進行錄影', 'C': '把手提電話鈴聲關上', 'D': '憑票入場', 'E': '以現金或八達通繳付車費'}, 'answers': {'1': ['B', 'C', 'D'], '2': ['A', 'E']}, 'explanation': '戲院規：不可錄影、關電話、憑票；巴士規：上層不可站立、以八達通或現金付費。'}, {'instruction': '以下哪些是駕駛者要遵守的規則？哪些是行人要遵守的規則？把它們分類。', 'cat1': '駕駛者要遵守的規則', 'cat2': '行人要遵守的規則', 'items': ['A', 'B', 'C', 'D', 'E'], 'itemText': {'A': '使用道路安全設施橫過馬路', 'B': '不可超速', 'C': '依照交通指示駕車', 'D': '保持安全車距', 'E': '依照交通燈號指示橫過馬路'}, 'answers': {'1': ['B', 'C', 'D'], '2': ['A', 'E']}, 'explanation': '駕駛者規：不可超速、按指示駕車、保持車距；行人規：使用過路設施、按交通燈過馬路。'}, {'instruction': '食物環境衞生署和香港海關分別有哪些執法工作？把它們分類。', 'cat1': '食物環境衞生署的執法工作', 'cat2': '香港海關的執法工作', 'items': ['A', 'B', 'C', 'D', 'E'], 'itemText': {'A': '發出食肆牌照', 'B': '防止走私', 'C': '管理小販', 'D': '保障知識產權', 'E': '緝毒'}, 'answers': {'1': ['A', 'C'], '2': ['B', 'D', 'E']}, 'explanation': '食環署負責發牌及管理小販；海關負責防止走私、保護知識產權及緝毒。'}];
+
+let answered = 0;
+let correctCount = 0;
+let cat1Selections = {};
+let cat2Selections = {};
+
+function renderQuestions() {
+  const container = document.getElementById("questions");
+  questions.forEach((q, i) => {
+    cat1Selections[i] = [];
+    cat2Selections[i] = [];
+
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "card-" + i;
+
+    const itemsHTML = q.items.map(item => 
+      `<span class="item-chip" id="chip-${i}-${item}" onclick="cycleItem(${i}, '${item}')">${item}. ${q.itemText[item]}</span>`
+    ).join("");
+
+    const cat1Chips = q.items.map(item =>
+      `<span class="cat-chip cat1-chip" id="c1-${i}-${item}" onclick="removeFromCat(${i}, '${item}', 1)">${item}</span>`
+    ).join("");
+    const cat2Chips = q.items.map(item =>
+      `<span class="cat-chip cat2-chip" id="c2-${i}-${item}" onclick="removeFromCat(${i}, '${item}', 2)">${item}</span>`
+    ).join("");
+
+    card.innerHTML = `
+      <span class="q-num">${i + 1}</span>
+      <p class="instruction">${q.instruction}</p>
+
+      <div class="pool-area">
+        <span class="pool-label">📋 選項（點擊卡片放入分類，完成後再點一次可移走）</span>
+        ${itemsHTML}
+      </div>
+
+      <div class="cat-zones">
+        <div class="cat-zone" id="zone1-${i}" ondragover="event.preventDefault(); this.classList.add('drop-active')" ondragleave="this.classList.remove('drop-active')" onclick="clearZone(${i}, 1)">
+          <span class="cat-header">🔵 ${q.cat1}</span>
+          <div id="slot1-${i}">${cat1Chips}</div>
+        </div>
+        <div class="cat-zone" id="zone2-${i}" ondragover="event.preventDefault(); this.classList.add('drop-active')" ondragleave="this.classList.remove('drop-active')" onclick="clearZone(${i}, 2)">
+          <span class="cat-header">🟠 ${q.cat2}</span>
+          <div id="slot2-${i}">${cat2Chips}</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-check" id="btn-check-${i}" onclick="checkQ(${i})">✓ 核對答案</button>
+        <button class="btn btn-reset" onclick="resetQ(${i})">🔄 重置</button>
+      </div>
+
+      <div class="feedback" id="fb-${i}"></div>
+    `;
+    container.appendChild(card);
+
+    // Initialize: hide chips in zones
+    q.items.forEach(item => {
+      const c1 = document.getElementById("c1-" + i + "-" + item);
+      const c2 = document.getElementById("c2-" + i + "-" + item);
+      if (c1) c1.style.display = "none";
+      if (c2) c2.style.display = "none";
+    });
+  });
+}
+
+// Cycle: unplaced -> cat1 -> cat2 -> unplaced
+function cycleItem(qIdx, item) {
+  const chip = document.getElementById("chip-" + qIdx + "-" + item);
+  const c1 = document.getElementById("c1-" + qIdx + "-" + item);
+  const c2 = document.getElementById("c2-" + qIdx + "-" + item);
+  const inCat1 = cat1Selections[qIdx].includes(item);
+  const inCat2 = cat2Selections[qIdx].includes(item);
+
+  if (!inCat1 && !inCat2) {
+    // Move to cat1
+    cat1Selections[qIdx].push(item);
+    cat2Selections[qIdx] = cat2Selections[qIdx].filter(x => x !== item);
+    chip.className = "item-chip placed-cat1";
+    if (c1) c1.style.display = "inline-flex";
+    if (c2) c2.style.display = "none";
+  } else if (inCat1) {
+    // Move from cat1 to cat2
+    cat1Selections[qIdx] = cat1Selections[qIdx].filter(x => x !== item);
+    cat2Selections[qIdx].push(item);
+    chip.className = "item-chip placed-cat2";
+    if (c1) c1.style.display = "none";
+    if (c2) c2.style.display = "inline-flex";
+  } else {
+    // Move out (back to pool)
+    cat1Selections[qIdx] = cat1Selections[qIdx].filter(x => x !== item);
+    cat2Selections[qIdx] = cat2Selections[qIdx].filter(x => x !== item);
+    chip.className = "item-chip placed-none";
+    if (c1) c1.style.display = "none";
+    if (c2) c2.style.display = "none";
+  }
+}
+
+function removeFromCat(qIdx, item, cat) {
+  cycleItem(qIdx, item);
+}
+
+function clearZone(qIdx, cat) {
+  if (cat === 1) {
+    [...cat1Selections[qIdx]].forEach(item => cycleItem(qIdx, item));
+  } else {
+    [...cat2Selections[qIdx]].forEach(item => cycleItem(qIdx, item));
+  }
+}
+
+function checkQ(qIdx) {
+  const q = questions[qIdx];
+  const sel1 = cat1Selections[qIdx].slice().sort();
+  const sel2 = cat2Selections[qIdx].slice().sort();
+  const ans1 = q.answers["1"].slice().sort();
+  const ans2 = q.answers["2"].slice().sort();
+
+  const isCorrect = JSON.stringify(sel1) === JSON.stringify(ans1) &&
+                    JSON.stringify(sel2) === JSON.stringify(ans2);
+
+  const feedback = document.getElementById("fb-" + qIdx);
+  const btn = document.getElementById("btn-check-" + qIdx);
+  const zone1 = document.getElementById("zone1-" + qIdx);
+  const zone2 = document.getElementById("zone2-" + qIdx);
+
+  btn.disabled = true;
+
+  // Mark chips
+  q.items.forEach(item => {
+    const chip = document.getElementById("chip-" + qIdx + "-" + item);
+    const inAns1 = ans1.includes(item);
+    const inAns2 = ans2.includes(item);
+    const inSel1 = sel1.includes(item);
+    const inSel2 = sel2.includes(item);
+
+    if (inAns1 && inSel1) chip.className = "item-chip correct-item";
+    else if (inAns2 && inSel2) chip.className = "item-chip correct-item";
+    else if (!inAns1 && !inAns2 && (inSel1 || inSel2)) chip.className = "item-chip wrong-item";
+    else if ((inAns1 && !inSel1 && !inSel2) || (inAns2 && !inSel1 && !inSel2)) chip.className = "item-chip missed-item";
+  });
+
+  if (isCorrect) {
+    correctCount++;
+    zone1.classList.add("correct-zone");
+    zone2.classList.add("correct-zone");
+    feedback.className = "feedback correct-fb show";
+    feedback.innerHTML = `🎉 正確！${q.explanation}`;
+  } else {
+    zone1.classList.add("wrong-zone");
+    zone2.classList.add("wrong-zone");
+    feedback.className = "feedback wrong-fb show";
+    const correct1 = ans1.length ? ans1.join("、") : "無";
+    const correct2 = ans2.length ? ans2.join("、") : "無";
+    feedback.innerHTML = `❌ 再想想！<br>正確答案：<strong>${q.cat1}：${correct1}</strong>；<strong>${q.cat2}：${correct2}</strong><br><small>💡 ${q.explanation}</small>`;
+  }
+
+  answered++;
+  updateProgress();
+  if (answered === questions.length) {
+    setTimeout(showResult, 800);
+  }
+}
+
+function resetQ(qIdx) {
+  questions[qIdx].items.forEach(item => {
+    cat1Selections[qIdx] = [];
+    cat2Selections[qIdx] = [];
+    const chip = document.getElementById("chip-" + qIdx + "-" + item);
+    const c1 = document.getElementById("c1-" + qIdx + "-" + item);
+    const c2 = document.getElementById("c2-" + qIdx + "-" + item);
+    if (chip) chip.className = "item-chip placed-none";
+    if (c1) c1.style.display = "none";
+    if (c2) c2.style.display = "none";
+  });
+
+  const feedback = document.getElementById("fb-" + qIdx);
+  const btn = document.getElementById("btn-check-" + qIdx);
+  const zone1 = document.getElementById("zone1-" + qIdx);
+  const zone2 = document.getElementById("zone2-" + qIdx);
+  if (feedback) { feedback.className = "feedback"; feedback.innerHTML = ""; }
+  if (btn) btn.disabled = false;
+  zone1.className = "cat-zone";
+  zone2.className = "cat-zone";
+}
+
+function updateProgress() {
+  const pct = Math.round((answered / questions.length) * 100);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `已答：${answered} / ${questions.length}`;
+}
+
+function showResult() {
+  const pct = Math.round((correctCount / questions.length) * 100);
+  const stars = pct === 100 ? "🌟🌟🌟" : pct >= 80 ? "🌟🌟" : pct >= 60 ? "🌟" : "💪";
+  document.getElementById("stars").textContent = stars;
+  document.getElementById("scoreNum").textContent = correctCount;
+  const pctText = pct >= 80 ? "太棒了！" : pct >= 60 ? "做得不錯！" : "繼續加油！";
+  document.getElementById("resultTitle").textContent = pctText;
+  document.getElementById("resultMsg").innerHTML =
+    `<span class="correct-count">✓ 正確：${correctCount}</span>　<span class="wrong-count">✗ 錯誤：${questions.length - correctCount}</span>`;
+  document.getElementById("resultSection").classList.add("show");
+}
+
+function resetQuiz() {
+  answered = 0; correctCount = 0;
+  cat1Selections = {}; cat2Selections = {};
+  document.getElementById("progressFill").style.width = "0%";
+  document.getElementById("progressText").textContent = "已答：0 / 11";
+  document.getElementById("resultSection").classList.remove("show");
+  document.getElementById("questions").innerHTML = "";
+  renderQuestions();
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
